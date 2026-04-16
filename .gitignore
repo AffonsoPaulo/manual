@@ -1,0 +1,16 @@
+vendor/
+.phpunit.result.cache
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# IDE/editor
+.idea/
+.vscode/
+
+# Logs e cobertura
+*.log
+coverage/
+docs/
+CLAUDE.md

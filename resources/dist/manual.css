@@ -1,0 +1,90 @@
+/*
+ * serveracloud/manual — publishable compiled stylesheet
+ * Host applications may override these rules after publishing this file.
+ *
+ * Syntax highlighting theme for highlight.php (hljs) — Atom One Dark inspired,
+ * warm-adjusted to complement the package's charcoal code background (#111827).
+ */
+
+/* ── Base ──────────────────────────────────────────────────────────────────── */
+.hljs {
+    color: #abb2bf;
+    background: transparent;
+}
+
+/* ── Comments & quotes ─────────────────────────────────────────────────────── */
+.hljs-comment,
+.hljs-quote {
+    color: #5c6370;
+    font-style: italic;
+}
+
+/* ── Keywords & tags ───────────────────────────────────────────────────────── */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-addition,
+.hljs-doctag,
+.hljs-formula {
+    color: #c678dd;
+}
+
+/* ── HTML tags, deleted, section headings ──────────────────────────────────── */
+.hljs-tag,
+.hljs-section,
+.hljs-name,
+.hljs-deletion,
+.hljs-subst {
+    color: #e06c75;
+}
+
+/* ── Constants & built-ins ─────────────────────────────────────────────────── */
+.hljs-literal,
+.hljs-type {
+    color: #56b6c2;
+}
+
+/* ── Strings, regexps, additions ───────────────────────────────────────────── */
+.hljs-string,
+.hljs-regexp,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+    color: #98c379;
+}
+
+/* ── Numbers, variables, template variables ────────────────────────────────── */
+.hljs-number,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-attr,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-pseudo {
+    color: #d19a66;
+}
+
+/* ── Functions, titles, links ──────────────────────────────────────────────── */
+.hljs-title,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id {
+    color: #61aeee;
+}
+
+/* ── Class names, built-ins ────────────────────────────────────────────────── */
+.hljs-built_in,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+    color: #e6c07b;
+}
+
+/* ── Params ────────────────────────────────────────────────────────────────── */
+.hljs-params {
+    color: #abb2bf;
+}
+
+/* ── Emphasis & strong ─────────────────────────────────────────────────────── */
+.hljs-emphasis { font-style: italic; }
+.hljs-strong   { font-weight: 700; }
+.hljs-link     { text-decoration: underline; }
