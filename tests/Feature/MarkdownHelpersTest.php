@@ -15,7 +15,7 @@ final class MarkdownHelpersTest extends TestCase {
     public function test_helpers_are_resolved_in_html_and_search_index(): void {
         $this->writeDoc('guide/install.md', <<<'MD'
 ---
-route_name: guia.instalacao
+key: guia.instalacao
 ---
 # Instalação
 
@@ -129,7 +129,7 @@ MD);
         $this->get('/manual/broken')
             ->assertStatus(500)
             ->assertSee('missing.doc')
-            ->assertSee('route_name')
+            ->assertSee('key')
             ->assertSee('broken.md');
     }
 
@@ -198,7 +198,7 @@ MD);
 
         $this->writeDoc($path, <<<'MD'
 ---
-route_name: guia.instalacao
+key: guia.instalacao
 ---
 # Instalação
 MD);
@@ -210,7 +210,7 @@ MD);
 
         $this->files->put($fullPath, <<<'MD'
 ---
-route_name: guia.instalacao
+key: guia.instalacao
 slug: setup
 ---
 # Instalação
@@ -230,7 +230,7 @@ MD);
 
         $this->writeDoc($path, <<<'MD'
 ---
-route_name: guia.instalacao
+key: guia.instalacao
 ---
 # Instalação
 MD);
@@ -242,7 +242,7 @@ MD);
 
         $this->files->put($fullPath, <<<'MD'
 ---
-route_name: guia.nova-instalacao
+key: guia.nova-instalacao
 ---
 # Instalação
 MD);
@@ -252,7 +252,7 @@ MD);
         $this->get('/manual/links')
             ->assertStatus(500)
             ->assertSee('guia.instalacao')
-            ->assertSee('route_name')
+            ->assertSee('key')
             ->assertSee('links.md');
     }
 }

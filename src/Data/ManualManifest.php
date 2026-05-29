@@ -8,7 +8,7 @@ final readonly class ManualManifest {
     /**
      * @param  list<DocumentDescriptor>  $documents
      * @param  array<string, DocumentDescriptor>  $documentsByRoute
-     * @param  array<string, DocumentDescriptor>  $documentsByRouteName
+     * @param  array<string, DocumentDescriptor>  $documentsByKey
      * @param  array<string, DocumentDescriptor>  $documentsByRelativePath
      * @param  array<string, DocumentDescriptor>  $directoryIndexDocuments
      * @param  list<DocumentDescriptor>  $visibleDocuments
@@ -19,7 +19,7 @@ final readonly class ManualManifest {
         public string $signature,
         public array $documents,
         public array $documentsByRoute,
-        public array $documentsByRouteName,
+        public array $documentsByKey,
         public array $documentsByRelativePath,
         public array $directoryIndexDocuments,
         public NavigationNode $navigationRoot,
@@ -36,8 +36,8 @@ final readonly class ManualManifest {
         return $this->documentsByRoute[$routePath] ?? null;
     }
 
-    public function documentForRouteName(string $routeName): ?DocumentDescriptor {
-        return $this->documentsByRouteName[$routeName] ?? null;
+    public function documentForKey(string $key): ?DocumentDescriptor {
+        return $this->documentsByKey[$key] ?? null;
     }
 
     public function documentForRelativePath(string $relativePath): ?DocumentDescriptor {

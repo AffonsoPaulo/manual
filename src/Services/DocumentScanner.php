@@ -39,7 +39,7 @@ final class DocumentScanner {
                 signature: sha1($sourcePath . '|empty'),
                 documents: [],
                 documentsByRoute: [],
-                documentsByRouteName: [],
+                documentsByKey: [],
                 documentsByRelativePath: [],
                 directoryIndexDocuments: [],
                 navigationRoot: $root,
@@ -69,7 +69,7 @@ final class DocumentScanner {
     private function buildManifest(string $sourcePath, array $markdownFiles, NavigationNode $root): ManualManifest {
         $scannedDocuments = [];
         $scannedDocumentsByRoute = [];
-        $scannedDocumentsByRouteName = [];
+        $scannedDocumentsByKey = [];
         $scannedDocumentsByRelativePath = [];
         $scannedDirectoryIndexDocuments = [];
 
@@ -91,11 +91,11 @@ final class DocumentScanner {
                 ));
             }
 
-            if ($document->routeName !== null && isset($scannedDocumentsByRouteName[$document->routeName])) {
+            if ($document->key !== null && isset($scannedDocumentsByKey[$document->key])) {
                 throw new DuplicateRouteNameException(sprintf(
-                    'Duplicate manual route_name "%s" for "%s" and "%s".',
-                    $document->routeName,
-                    $scannedDocumentsByRouteName[$document->routeName]->relativePath,
+                    'Duplicate manual key "%s" for "%s" and "%s".',
+                    $document->key,
+                    $scannedDocumentsByKey[$document->key]->relativePath,
                     $document->relativePath,
                 ));
             }
@@ -104,8 +104,8 @@ final class DocumentScanner {
             $scannedDocumentsByRoute[$document->routePath] = $document;
             $scannedDocumentsByRelativePath[$document->relativePath] = $document;
 
-            if ($document->routeName !== null) {
-                $scannedDocumentsByRouteName[$document->routeName] = $document;
+            if ($document->key !== null) {
+                $scannedDocumentsByKey[$document->key] = $document;
             }
 
             if ($document->isIndex) {
@@ -118,7 +118,7 @@ final class DocumentScanner {
             signature: $this->signatureFor($sourcePath, $scannedDocuments),
             documents: $scannedDocuments,
             documentsByRoute: $scannedDocumentsByRoute,
-            documentsByRouteName: $scannedDocumentsByRouteName,
+            documentsByKey: $scannedDocumentsByKey,
             documentsByRelativePath: $scannedDocumentsByRelativePath,
             directoryIndexDocuments: $scannedDirectoryIndexDocuments,
             navigationRoot: new NavigationNode('', ''),
@@ -128,7 +128,7 @@ final class DocumentScanner {
 
         $documents = [];
         $documentsByRoute = [];
-        $documentsByRouteName = [];
+        $documentsByKey = [];
         $documentsByRelativePath = [];
         $directoryIndexDocuments = [];
 
@@ -139,8 +139,8 @@ final class DocumentScanner {
             $documentsByRoute[$resolvedDocument->routePath] = $resolvedDocument;
             $documentsByRelativePath[$resolvedDocument->relativePath] = $resolvedDocument;
 
-            if ($resolvedDocument->routeName !== null) {
-                $documentsByRouteName[$resolvedDocument->routeName] = $resolvedDocument;
+            if ($resolvedDocument->key !== null) {
+                $documentsByKey[$resolvedDocument->key] = $resolvedDocument;
             }
 
             if ($resolvedDocument->isIndex) {
@@ -168,7 +168,7 @@ final class DocumentScanner {
             ),
             documents: $documents,
             documentsByRoute: $documentsByRoute,
-            documentsByRouteName: $documentsByRouteName,
+            documentsByKey: $documentsByKey,
             documentsByRelativePath: $documentsByRelativePath,
             directoryIndexDocuments: $directoryIndexDocuments,
             navigationRoot: $root,
@@ -210,7 +210,7 @@ final class DocumentScanner {
                     directorySegments: $directorySegments,
                     basename: $basename,
                     routePath: $routePath,
-                    routeName: $this->resolveRouteName($attributes),
+                    key: $this->resolveDocKey($attributes),
                     isIndex: $isIndex,
                     title: $this->resolveTitle($attributes, $headings, $directorySegments, $basename, $isIndex),
                     description: $this->resolveDescription($attributes),
@@ -241,7 +241,7 @@ final class DocumentScanner {
             directorySegments: $document->directorySegments,
             basename: $document->basename,
             routePath: $document->routePath,
-            routeName: $document->routeName,
+            key: $document->key,
             isIndex: $document->isIndex,
             title: $this->resolveTitle(
                 $document->frontMatter,
@@ -278,8 +278,17 @@ final class DocumentScanner {
     ): string {
         $defaultSegments = $isIndex ? $directorySegments : [...$directorySegments, $basename];
 
-        if (array_key_exists('route', $attributes)) {
-            return $this->normalizeRoutePath((string) $attributes['route']);
+        if (array_key_exists('url', $attributes)) {
+            $normalized = $this->normalizeRoutePath((string) $attributes['url']);
+
+            if ($normalized === '') {
+                throw new InvalidFrontMatterException(sprintf(
+                    'The "url" front matter for "%s" cannot be empty or resolve to the root path. Use the source root index.md instead.',
+                    $relativePath,
+                ));
+            }
+
+            return $normalized;
         }
 
         if (array_key_exists('slug', $attributes)) {
@@ -287,6 +296,13 @@ final class DocumentScanner {
 
             if ($slug === '') {
                 throw new InvalidFrontMatterException(sprintf('The "slug" front matter for "%s" cannot be empty.', $relativePath));
+            }
+
+            if (str_contains($slug, '/')) {
+                throw new InvalidFrontMatterException(sprintf(
+                    'The "slug" front matter for "%s" cannot contain path separators ("/"). Use "url" to override the full path.',
+                    $relativePath,
+                ));
             }
 
             if ($defaultSegments === []) {
@@ -352,14 +368,14 @@ final class DocumentScanner {
     /**
      * @param  array<string, mixed>  $attributes
      */
-    private function resolveRouteName(array $attributes): ?string {
-        if (! array_key_exists('route_name', $attributes)) {
+    private function resolveDocKey(array $attributes): ?string {
+        if (! array_key_exists('key', $attributes)) {
             return null;
         }
 
-        $routeName = trim((string) $attributes['route_name']);
+        $docKey = trim((string) $attributes['key']);
 
-        return $routeName === '' ? null : $routeName;
+        return $docKey === '' ? null : $docKey;
     }
 
     private function attachToNavigationTree(NavigationNode $root, DocumentDescriptor $document): void {
@@ -517,7 +533,7 @@ final class DocumentScanner {
                 $document->relativePath,
                 (string) $document->fileMtime,
                 $document->routePath,
-                $document->routeName ?? '',
+                $document->key ?? '',
                 sha1($document->markdown),
             ]);
         }

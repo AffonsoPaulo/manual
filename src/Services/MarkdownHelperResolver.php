@@ -223,11 +223,11 @@ final class MarkdownHelperResolver {
         string $documentPath,
         ManualManifest $manifest,
     ): string {
-        $document = $manifest->documentForRouteName($routeName);
+        $document = $manifest->documentForKey($routeName);
 
         if ($document === null) {
             throw new DocumentRouteNameNotFoundException(sprintf(
-                'The manual document route_name "%s" referenced by "{{ %s }}" in "%s" does not exist.',
+                'The manual document key "%s" referenced by "{{ %s }}" in "%s" does not exist.',
                 $routeName,
                 $expression,
                 $documentPath,

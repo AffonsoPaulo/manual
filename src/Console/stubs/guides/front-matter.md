@@ -11,10 +11,10 @@ Each Markdown file may start with a YAML front matter block:
 ---
 title: Installation
 slug: setup
-route: guides/setup
+url: guides/setup
 order: 2
 description: Prepare the package for first use.
-route_name: guides.installation
+key: guides.installation
 hidden: false
 ---
 ```
@@ -25,8 +25,8 @@ hidden: false
 | --- | --- | --- |
 | `title` | string | Overrides the page title shown in the manual. |
 | `slug` | string | Replaces only the last URL segment for the current file. |
-| `route` | string | Replaces the full public path for the current document. |
+| `url` | string | Replaces the full public URL path for the current document. |
 | `order` | integer | Controls navigation order before the alphabetical fallback. |
 | `description` | string | Provides summary text for search results and page metadata. |
-| `route_name` | string | Creates a stable identifier for `doc()` helper lookups. |
+| `key` | string | Creates a stable identifier for `doc()` helper lookups. |
 | `hidden` | boolean | Removes the page from navigation and search while keeping its URL accessible. |

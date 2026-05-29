@@ -29,7 +29,7 @@ final class InitDocCommand extends Command {
         'advanced/customization.md',
     ];
 
-    protected $signature = 'manual:doc {--force : Overwrite scaffold files that already exist}';
+    protected $signature = 'manual:init {--force : Overwrite scaffold files that already exist}';
 
     protected $description = 'Create the default manual documentation scaffold.';
 

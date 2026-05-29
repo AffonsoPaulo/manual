@@ -49,7 +49,7 @@ final class FrontMatterParser {
      * @return array<string, mixed>
      */
     private function normalizeAttributes(array $attributes, string $documentPath): array {
-        foreach (['title', 'slug', 'route', 'description', 'route_name'] as $key) {
+        foreach (['title', 'slug', 'url', 'description', 'key'] as $key) {
             if (array_key_exists($key, $attributes) && ! is_string($attributes[$key])) {
                 throw new InvalidFrontMatterException(sprintf(
                     'The "%s" front matter for "%s" must be a string.',
@@ -79,17 +79,17 @@ final class FrontMatterParser {
             $attributes['order'] = (int) $order;
         }
 
-        if (array_key_exists('route_name', $attributes)) {
-            $routeName = trim((string) $attributes['route_name']);
+        if (array_key_exists('key', $attributes)) {
+            $docKey = trim((string) $attributes['key']);
 
-            if ($routeName === '') {
+            if ($docKey === '') {
                 throw new InvalidFrontMatterException(sprintf(
-                    'The "route_name" front matter for "%s" cannot be empty.',
+                    'The "key" front matter for "%s" cannot be empty.',
                     $documentPath,
                 ));
             }
 
-            $attributes['route_name'] = $routeName;
+            $attributes['key'] = $docKey;
         }
 
         return $attributes;

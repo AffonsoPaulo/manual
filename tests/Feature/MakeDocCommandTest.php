@@ -9,7 +9,7 @@ use ServeraCloud\Manual\Tests\TestCase;
 
 final class MakeDocCommandTest extends TestCase {
     public function test_it_creates_a_new_document_from_a_simple_name(): void {
-        $this->artisan('make:doc', ['name' => 'foo'])
+        $this->artisan('manual:make', ['name' => 'foo'])
             ->expectsOutputToContain('Manual document created')
             ->assertSuccessful();
 
@@ -20,17 +20,19 @@ final class MakeDocCommandTest extends TestCase {
         $this->assertSame('Foo', $parsed->attributes['title']);
         $this->assertStringContainsString('# Foo', $parsed->body);
         $this->assertStringContainsString('# slug: my-slug', $this->readDoc('foo.md'));
+        $this->assertStringContainsString('# url: custom/path', $this->readDoc('foo.md'));
+        $this->assertStringContainsString('# key: my.doc.key', $this->readDoc('foo.md'));
     }
 
     public function test_it_creates_a_nested_document_and_accepts_the_md_extension(): void {
-        $this->artisan('make:doc', ['name' => 'guides/install.md'])
+        $this->artisan('manual:make', ['name' => 'guides/install.md'])
             ->assertSuccessful();
 
         $this->assertFileExists($this->docsPath . '/guides/install.md');
     }
 
     public function test_it_derives_the_section_title_for_nested_index_documents(): void {
-        $this->artisan('make:doc', ['name' => 'guides/index'])
+        $this->artisan('manual:make', ['name' => 'guides/index'])
             ->assertSuccessful();
 
         $parsed = app(FrontMatterParser::class)->parse($this->readDoc('guides/index.md'), 'guides/index.md');
@@ -40,14 +42,14 @@ final class MakeDocCommandTest extends TestCase {
     }
 
     public function test_it_serializes_supported_front_matter_options_safely(): void {
-        $this->artisan('make:doc', [
+        $this->artisan('manual:make', [
             'name' => 'guides/safe',
             '--title' => 'Safe "Guide": Intro',
             '--slug' => 'safe-guide',
-            '--route' => 'guides/custom-safe',
+            '--url' => 'guides/custom-safe',
             '--order' => '7',
             '--description' => 'Quotes: "yes", colon: ok',
-            '--route-name' => 'guides.safe',
+            '--key' => 'guides.safe',
             '--hidden' => true,
         ])->assertSuccessful();
 
@@ -56,10 +58,10 @@ final class MakeDocCommandTest extends TestCase {
         $this->assertSame([
             'title' => 'Safe "Guide": Intro',
             'slug' => 'safe-guide',
-            'route' => 'guides/custom-safe',
+            'url' => 'guides/custom-safe',
             'order' => 7,
             'description' => 'Quotes: "yes", colon: ok',
-            'route_name' => 'guides.safe',
+            'key' => 'guides.safe',
             'hidden' => true,
         ], $parsed->attributes);
         $this->assertStringContainsString('# Safe "Guide": Intro', $parsed->body);
@@ -68,7 +70,7 @@ final class MakeDocCommandTest extends TestCase {
     public function test_it_refuses_to_overwrite_an_existing_document_without_force(): void {
         $this->writeDoc('guides/existing.md', "# Existing\n");
 
-        $this->artisan('make:doc', ['name' => 'guides/existing'])
+        $this->artisan('manual:make', ['name' => 'guides/existing'])
             ->expectsOutputToContain('already exists')
             ->assertFailed();
 
@@ -78,7 +80,7 @@ final class MakeDocCommandTest extends TestCase {
     public function test_it_overwrites_an_existing_document_with_force(): void {
         $this->writeDoc('guides/existing.md', "# Existing\n");
 
-        $this->artisan('make:doc', [
+        $this->artisan('manual:make', [
             'name' => 'guides/existing',
             '--title' => 'Updated',
             '--force' => true,
@@ -90,7 +92,7 @@ final class MakeDocCommandTest extends TestCase {
     }
 
     public function test_it_rejects_path_traversal_inputs(): void {
-        $this->artisan('make:doc', ['name' => '../escape'])
+        $this->artisan('manual:make', ['name' => '../escape'])
             ->expectsOutputToContain('invalid path segment')
             ->assertFailed();
 
@@ -98,21 +100,29 @@ final class MakeDocCommandTest extends TestCase {
     }
 
     public function test_it_rejects_absolute_paths(): void {
-        $this->artisan('make:doc', ['name' => '/tmp/escape'])
+        $this->artisan('manual:make', ['name' => '/tmp/escape'])
             ->expectsOutputToContain('must be relative to manual.source_path')
             ->assertFailed();
 
-        $this->artisan('make:doc', ['name' => 'C:\\temp\\escape'])
+        $this->artisan('manual:make', ['name' => 'C:\\temp\\escape'])
             ->expectsOutputToContain('must be relative to manual.source_path')
             ->assertFailed();
     }
 
     public function test_it_rejects_invalid_order_values(): void {
-        $this->artisan('make:doc', [
+        $this->artisan('manual:make', [
             'name' => 'guides/invalid-order',
             '--order' => 'abc',
         ])->expectsOutputToContain('must be an integer')
             ->assertFailed();
+    }
+
+    public function test_it_is_also_accessible_via_the_make_namespace_alias(): void {
+        $this->artisan('make:manual', ['name' => 'alias-test'])
+            ->expectsOutputToContain('Manual document created')
+            ->assertSuccessful();
+
+        $this->assertFileExists($this->docsPath . '/alias-test.md');
     }
 
     public function test_it_rejects_symlink_escape_when_supported_by_the_filesystem(): void {
@@ -131,7 +141,7 @@ final class MakeDocCommandTest extends TestCase {
         }
 
         try {
-            $this->artisan('make:doc', ['name' => 'shared/escape'])
+            $this->artisan('manual:make', ['name' => 'shared/escape'])
                 ->expectsOutputToContain('resolves outside of manual.source_path')
                 ->assertFailed();
 

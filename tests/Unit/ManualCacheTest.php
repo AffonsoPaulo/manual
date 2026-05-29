@@ -22,6 +22,42 @@ final class ManualCacheTest extends TestCase
         $this->assertNotSame('manual:registry', $registryKey);
     }
 
+    public function test_key_is_collision_resistant_when_parts_contain_pipe_characters(): void
+    {
+        $cache = app(ManualCache::class);
+
+        $keyA = $cache->key('manifest', 'a|b', 'c');
+        $keyB = $cache->key('manifest', 'a', 'b|c');
+
+        $this->assertNotSame($keyA, $keyB);
+    }
+
+    public function test_remember_falls_back_to_callback_when_store_is_unavailable(): void
+    {
+        $this->app['config']->set('manual.cache_store', 'nonexistent-driver');
+        $cache = app(ManualCache::class);
+
+        $calls = 0;
+        $value = $cache->remember('some-key', function () use (&$calls): string {
+            $calls++;
+
+            return 'computed';
+        });
+
+        $this->assertSame('computed', $value);
+        $this->assertSame(1, $calls);
+    }
+
+    public function test_clear_returns_zero_when_store_is_unavailable(): void
+    {
+        $this->app['config']->set('manual.cache_store', 'nonexistent-driver');
+        $cache = app(ManualCache::class);
+
+        $result = $cache->clear();
+
+        $this->assertSame(0, $result);
+    }
+
     public function test_remember_recomputes_when_cached_value_is_an_incomplete_class(): void
     {
         $cache = app(ManualCache::class);

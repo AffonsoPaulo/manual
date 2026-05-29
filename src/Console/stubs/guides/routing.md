@@ -27,17 +27,17 @@ With a `slug` override (last segment only):
 ```yaml
 ---
 slug: setup
-route_name: guides.installation
+key: guides.installation
 ---
 ```
 
 `guides/installation.md` becomes `/manual/guides/setup` instead of `/manual/guides/installation`.
 
-With a `route` override (full relative path):
+With a `url` override (full relative path):
 
 ```yaml
 ---
-route: reference/install
+url: reference/install
 ---
 ```
 

@@ -19,7 +19,7 @@ final readonly class DocumentDescriptor implements JsonSerializable {
         public array $directorySegments,
         public string $basename,
         public string $routePath,
-        public ?string $routeName,
+        public ?string $key,
         public bool $isIndex,
         public string $title,
         public ?string $description,
@@ -65,7 +65,7 @@ final readonly class DocumentDescriptor implements JsonSerializable {
         return [
             'relative_path' => $this->relativePath,
             'route_path' => $this->routePath,
-            'route_name' => $this->routeName,
+            'key' => $this->key,
             'title' => $this->title,
             'description' => $this->description,
             'hidden' => $this->hidden,

@@ -8,7 +8,7 @@ use ServeraCloud\Manual\Tests\TestCase;
 
 final class InitDocCommandTest extends TestCase {
     public function test_it_creates_the_default_manual_scaffold_in_an_absolute_source_path(): void {
-        $this->artisan('manual:doc')
+        $this->artisan('manual:init')
             ->expectsOutputToContain('Manual scaffold complete')
             ->assertSuccessful();
 
@@ -23,7 +23,7 @@ final class InitDocCommandTest extends TestCase {
         $this->useManualSourcePath($relativePath);
 
         try {
-            $this->artisan('manual:doc')
+            $this->artisan('manual:init')
                 ->expectsOutputToContain('Manual scaffold complete')
                 ->assertSuccessful();
 
@@ -38,14 +38,14 @@ final class InitDocCommandTest extends TestCase {
         $this->writeDoc('index.md', "# Custom Home\n");
         $this->writeDoc('custom.md', "# Keep Me\n");
 
-        $this->artisan('manual:doc')
+        $this->artisan('manual:init')
             ->expectsOutputToContain('skipped')
             ->assertSuccessful();
 
         $this->assertStringContainsString('Custom Home', $this->readDoc('index.md'));
         $this->assertSame("# Keep Me\n", $this->readDoc('custom.md'));
 
-        $this->artisan('manual:doc', ['--force' => true])
+        $this->artisan('manual:init', ['--force' => true])
             ->expectsOutputToContain('overwritten')
             ->assertSuccessful();
 
@@ -54,7 +54,7 @@ final class InitDocCommandTest extends TestCase {
     }
 
     public function test_generated_scaffold_builds_successfully(): void {
-        $this->artisan('manual:doc')->assertSuccessful();
+        $this->artisan('manual:init')->assertSuccessful();
 
         $this->artisan('manual:build')
             ->expectsOutputToContain('Manual build complete')

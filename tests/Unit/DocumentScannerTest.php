@@ -22,7 +22,7 @@ final class DocumentScannerTest extends TestCase {
 
     public function test_it_throws_for_duplicate_resolved_routes(): void {
         $this->writeDoc('guide/intro.md', "# Intro");
-        $this->writeDoc('guide/other.md', "---\nroute: guide/intro\n---\n# Outro");
+        $this->writeDoc('guide/other.md', "---\nurl: guide/intro\n---\n# Outro");
 
         $this->expectException(DuplicateRouteException::class);
 
@@ -30,8 +30,8 @@ final class DocumentScannerTest extends TestCase {
     }
 
     public function test_it_throws_for_duplicate_route_names(): void {
-        $this->writeDoc('guide/intro.md', "---\nroute_name: guia.intro\n---\n# Intro");
-        $this->writeDoc('guide/other.md', "---\nroute_name: guia.intro\n---\n# Outro");
+        $this->writeDoc('guide/intro.md', "---\nkey: guia.intro\n---\n# Intro");
+        $this->writeDoc('guide/other.md', "---\nkey: guia.intro\n---\n# Outro");
 
         $this->expectException(DuplicateRouteNameException::class);
 
@@ -39,7 +39,7 @@ final class DocumentScannerTest extends TestCase {
     }
 
     public function test_it_validates_route_name_front_matter(): void {
-        $this->writeDoc('guide/intro.md', "---\nroute_name:\n  nested: true\n---\n# Intro");
+        $this->writeDoc('guide/intro.md', "---\nkey:\n  nested: true\n---\n# Intro");
 
         $this->expectException(InvalidFrontMatterException::class);
 
@@ -54,6 +54,33 @@ final class DocumentScannerTest extends TestCase {
 
         $this->assertNotNull($document);
         $this->assertSame('Guia Principal', $document->title);
+    }
+
+    public function test_it_throws_for_empty_url_front_matter(): void {
+        $this->writeDoc('guide/intro.md', "---\nurl: \"\"\n---\n# Intro");
+
+        $this->expectException(InvalidFrontMatterException::class);
+        $this->expectExceptionMessageMatches('/"url"/');
+
+        app(DocumentScanner::class)->scan();
+    }
+
+    public function test_it_throws_for_url_that_normalizes_to_root(): void {
+        $this->writeDoc('guide/intro.md', "---\nurl: /\n---\n# Intro");
+
+        $this->expectException(InvalidFrontMatterException::class);
+        $this->expectExceptionMessageMatches('/"url"/');
+
+        app(DocumentScanner::class)->scan();
+    }
+
+    public function test_it_throws_for_slug_with_path_separator(): void {
+        $this->writeDoc('guide/intro.md', "---\nslug: api/v2\n---\n# Intro");
+
+        $this->expectException(InvalidFrontMatterException::class);
+        $this->expectExceptionMessageMatches('/"slug"/');
+
+        app(DocumentScanner::class)->scan();
     }
 
     public function test_it_throws_for_unreadable_documents(): void {

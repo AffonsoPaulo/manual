@@ -26,36 +26,45 @@ final class ManualCache
             return $callback();
         }
 
-        $store = $this->store();
-        $missing = new stdClass();
-        $value = $store->get($key, $missing);
+        try {
+            $store = $this->store();
+            $missing = new stdClass();
+            $value = $store->get($key, $missing);
 
-        if ($value !== $missing) {
-            if (! $this->containsIncompleteClass($value)) {
-                $this->track($key);
+            if ($value !== $missing) {
+                if (! $this->containsIncompleteClass($value)) {
+                    $this->track($key);
 
-                return $value;
+                    return $value;
+                }
+
+                $store->forget($key);
             }
 
-            $store->forget($key);
+            $value = $callback();
+
+            if ($ttl === null) {
+                $store->forever($key, $value);
+            } else {
+                $store->put($key, $value, $ttl);
+            }
+
+            $this->track($key);
+
+            return $value;
+        } catch (\Throwable $exception) {
+            logger()->warning('Manual cache store unavailable, bypassing cache.', [
+                'key' => $key,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return $callback();
         }
-
-        $value = $callback();
-
-        if ($ttl === null) {
-            $store->forever($key, $value);
-        } else {
-            $store->put($key, $value, $ttl);
-        }
-
-        $this->track($key);
-
-        return $value;
     }
 
     public function key(string $prefix, string ...$parts): string
     {
-        return 'manual:' . $prefix . ':' . sha1(implode('|', $parts));
+        return 'manual:' . $prefix . ':' . sha1((string) json_encode($parts));
     }
 
     /**
@@ -68,16 +77,24 @@ final class ManualCache
 
     public function clear(): int
     {
-        $store = $this->store();
-        $keys = $this->trackedKeys();
+        try {
+            $store = $this->store();
+            $keys = $this->trackedKeys();
 
-        foreach ($keys as $key) {
-            $store->forget($key);
+            foreach ($keys as $key) {
+                $store->forget($key);
+            }
+
+            $store->forget($this->registryKey());
+
+            return count($keys);
+        } catch (\Throwable $exception) {
+            logger()->warning('Manual cache store unavailable, clear skipped.', [
+                'error' => $exception->getMessage(),
+            ]);
+
+            return 0;
         }
-
-        $store->forget($this->registryKey());
-
-        return count($keys);
     }
 
     private function store(): CacheRepository

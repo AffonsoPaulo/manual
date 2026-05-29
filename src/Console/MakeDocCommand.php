@@ -16,14 +16,16 @@ use Symfony\Component\Yaml\Yaml;
 use Throwable;
 
 final class MakeDocCommand extends Command {
-    protected $signature = 'make:doc
+    protected $aliases = ['make:manual'];
+
+    protected $signature = 'manual:make
         {name : Relative document path inside manual.source_path}
         {--title= : The page title written to front matter and the H1 heading}
         {--slug= : The slug front matter value}
-        {--route= : The route front matter value}
+        {--url= : The url front matter value}
         {--order= : The order front matter value}
         {--description= : The description front matter value}
-        {--route-name= : The route_name front matter value}
+        {--key= : The key front matter value}
         {--hidden : Mark the generated document as hidden}
         {--force : Overwrite the document if it already exists}';
 
@@ -87,10 +89,10 @@ final class MakeDocCommand extends Command {
             $commentedExamples[] = '# slug: my-slug';
         }
 
-        if (($route = $this->optionalStringOption('route')) !== null) {
-            $frontMatter['route'] = $route;
+        if (($url = $this->optionalStringOption('url')) !== null) {
+            $frontMatter['url'] = $url;
         } else {
-            $commentedExamples[] = '# route: custom/path';
+            $commentedExamples[] = '# url: custom/path';
         }
 
         if (($order = $this->resolvedOrder()) !== null) {
@@ -105,10 +107,10 @@ final class MakeDocCommand extends Command {
             $commentedExamples[] = '# description: Short description shown in search results.';
         }
 
-        if (($routeName = $this->optionalStringOption('route-name')) !== null) {
-            $frontMatter['route_name'] = $routeName;
+        if (($docKey = $this->optionalStringOption('key')) !== null) {
+            $frontMatter['key'] = $docKey;
         } else {
-            $commentedExamples[] = '# route_name: my.route.name';
+            $commentedExamples[] = '# key: my.doc.key';
         }
 
         if ((bool) $this->option('hidden')) {

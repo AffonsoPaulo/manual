@@ -28,7 +28,7 @@ final class DocumentationRoutesTest extends TestCase {
 
     public function test_slug_and_route_front_matter_are_respected(): void {
         $this->writeDoc('guide/getting-started.md', "---\nslug: comecar\n---\n# Começar\n");
-        $this->writeDoc('guide/deep-dive.md', "---\nroute: parceiros/especial\n---\n# Especial\n");
+        $this->writeDoc('guide/deep-dive.md', "---\nurl: parceiros/especial\n---\n# Especial\n");
 
         $this->get('/manual/guide/comecar')
             ->assertOk()
