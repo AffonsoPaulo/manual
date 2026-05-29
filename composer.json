@@ -1,5 +1,5 @@
 {
-    "name": "serveracloud/manual",
+    "name": "affonsopaulo/manual",
     "description": "Laravel package for serving Markdown documentation as a documentation site.",
     "type": "library",
     "license": "MIT",

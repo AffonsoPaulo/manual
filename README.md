@@ -1,8 +1,8 @@
 # Servera Manual
 
-[![Latest Version](https://img.shields.io/packagist/v/serveracloud/manual)](https://packagist.org/packages/serveracloud/manual)
-[![PHP Version](https://img.shields.io/packagist/php-v/serveracloud/manual)](https://packagist.org/packages/serveracloud/manual)
-[![License](https://img.shields.io/packagist/l/serveracloud/manual)](https://packagist.org/packages/serveracloud/manual)
+[![Latest Version](https://img.shields.io/packagist/v/affonsopaulo/manual)](https://packagist.org/packages/affonsopaulo/manual)
+[![PHP Version](https://img.shields.io/packagist/php-v/affonsopaulo/manual)](https://packagist.org/packages/affonsopaulo/manual)
+[![License](https://img.shields.io/packagist/l/affonsopaulo/manual)](https://packagist.org/packages/affonsopaulo/manual)
 
 A Laravel package that turns a directory of Markdown files into a fully-rendered, searchable documentation site — no build step, no Node.js, no database. Drop in your `.md` files, run one Artisan command, and your docs are live.
 
@@ -39,8 +39,6 @@ Servera Manual scans a directory tree of Markdown files and serves them as a sty
 3. A `DocumentController` handles every URL under the configured prefix and serves the rendered Blade view.
 4. Images, search JSON, and assets each have their own dedicated controllers.
 
-The compiled front-end assets ship inside the package — your application does not need Node.js or any build tooling.
-
 ---
 
 ## Installation
@@ -48,39 +46,23 @@ The compiled front-end assets ship inside the package — your application does 
 Install the package via Composer:
 
 ```bash
-composer require serveracloud/manual
+composer require affonsopaulo/manual
 ```
 
 The package auto-discovers and registers its service provider. You do not need to add anything to `config/app.php`.
 
-### Publish the configuration file
-
-Publish the config file when you need to override any default:
+Publish the configuration file when you need to override any default, and publish the compiled assets so browsers can load them:
 
 ```bash
 php artisan vendor:publish --tag=manual-config
-```
-
-This creates `config/manual.php` in your application.
-
-### Publish assets
-
-The package ships with pre-compiled CSS and JavaScript. Publish them to `public/vendor/manual` so browsers can load them:
-
-```bash
 php artisan vendor:publish --tag=manual-assets
 ```
-
-> If you want to replace the default Blade view entirely, publish the views too:
-> ```bash
-> php artisan vendor:publish --tag=manual-views
-> ```
 
 ---
 
 ## Your First Documentation Page
 
-The fastest way to get started is to scaffold the default documentation structure using the `manual:init` command. It creates a ready-to-use layout including an index page, a Getting Started section, guides, and an advanced section:
+The fastest way to get started is to scaffold the default documentation structure:
 
 ```bash
 php artisan manual:init
@@ -97,7 +79,7 @@ created getting-started/installation.md
 Manual scaffold complete: 14 created, 0 overwritten, 0 skipped. Run "php artisan manual:build" next.
 ```
 
-Now build the cache and search index:
+Now warm the cache and build the search index:
 
 ```bash
 php artisan manual:build
@@ -107,17 +89,13 @@ Visit `/manual` in your browser — your documentation site is live.
 
 ### Creating a single page
 
-You can also create individual pages at any time with the `manual:make` command:
-
-```bash
-php artisan manual:make guides/authentication
-```
-
-This scaffolds `docs/manual/guides/authentication.md` with a front matter block and an `# Authentication` heading. Add `--title` to control the heading:
+To add a page without the full scaffold, use `manual:make` with the path relative to `source_path`:
 
 ```bash
 php artisan manual:make guides/authentication --title="Authentication Guide" --order=3
 ```
+
+This creates `docs/manual/guides/authentication.md` with a front matter block and an `# Authentication Guide` heading. See [Artisan Commands](#artisan-commands) for all available options.
 
 ---
 
@@ -194,7 +172,7 @@ When no `title` is set, the package resolves the title in this order:
 
 ## Routing
 
-URLs are derived from the file path relative to `source_path`. The route prefix (default: `manual`) is prepended to every URL. The following table shows examples with the default prefix:
+URLs are derived from the file path relative to `source_path`. The route prefix (default: `manual`) is prepended to every URL:
 
 | File | URL |
 |---|---|
@@ -203,108 +181,49 @@ URLs are derived from the file path relative to `source_path`. The route prefix 
 | `guides/front-matter.md` | `/manual/guides/front-matter` |
 | `advanced/caching.md` | `/manual/advanced/caching` |
 
-### Overriding the last segment with `slug`
-
-Use `slug` when you want a different URL segment than the filename, without moving the file:
-
-```yaml
----
-slug: setup
----
-```
-
-`guides/installation.md` becomes `/manual/guides/setup`.
-
-### Overriding the full path with `url`
-
-Use `url` to place a page at a completely different path:
-
-```yaml
----
-url: reference/install
----
-```
-
-`guides/installation.md` becomes `/manual/reference/install`, independent of where it lives in the directory.
+To customize how a specific document's URL is derived, use the `slug` or `url` front matter fields — see [Front Matter](#front-matter).
 
 ### Changing the route prefix
 
-To serve documentation at a different base URL, update `route_prefix` in `config/manual.php`:
+Update `route_prefix` in `config/manual.php` to serve documentation at a different base URL:
 
 ```php
 'route_prefix' => 'docs',
 ```
 
-All documentation URLs will now start with `/docs` instead of `/manual`.
-
-> To serve documentation at the root of your application (e.g. `/`), set `route_prefix` to an empty string: `'route_prefix' => ''`.
+To serve at the application root, set it to an empty string: `'route_prefix' => ''`.
 
 ---
 
 ## Navigation
 
-The sidebar is built automatically from the directory structure. Directories become sections, `index.md` files become section landing pages, and all other documents become leaf entries.
+The sidebar is built automatically from the directory structure. Directories become sections, `index.md` files become their landing pages, and all other documents become leaf entries.
 
-### Controlling order
+Pages are sorted by `order` (ascending) first, then alphabetically. To order a whole section, add `order` to its `index.md`.
 
-Add an `order` value to any page's front matter to pin its position in the navigation. Pages without `order` sort alphabetically after pages that have one.
-
-```yaml
----
-order: 1
----
-```
-
-To order an entire section, add `order` to its `index.md`.
-
-### Hiding a page
-
-Set `hidden: true` to remove a page from navigation and the search index. The page is still accessible via its URL, making this ideal for draft or internal pages you are not ready to promote:
-
-```yaml
----
-hidden: true
----
-```
+Pages with `hidden: true` are excluded from navigation and the search index but remain accessible by URL — ideal for drafts or internal content. Both fields are set in [front matter](#front-matter).
 
 ### Sections
 
-Any directory with an `index.md` becomes a collapsible section in the sidebar. A directory without an `index.md` still groups its children, but it will not have a dedicated landing page link.
+Any directory with an `index.md` becomes a collapsible section in the sidebar with a dedicated landing page link. A directory without an `index.md` still groups its children visually but has no link of its own.
 
 ---
 
 ## Images
 
-Place image files inside the `_images` directory at the root of your `source_path`:
+Place image files inside the `_images` directory at the root of your `source_path`. The package serves them automatically through the same URL prefix and middleware as your documents.
 
-```
-docs/manual/
-└── _images/
-    ├── screenshot.png
-    └── icons/
-        └── arrow.png
-```
+### The `@image/` alias
 
-The package serves images automatically through the same URL prefix and middleware as your documents. No separate controller setup is required.
-
-### Referencing images with the `@image/` alias
-
-Use the `@image/` (or `@images/`) alias to reference any image without worrying about relative paths. This alias always resolves to the configured images directory, regardless of how deeply nested the page is:
+Use the `@image/` (or `@images/`) alias to reference any image from any page, regardless of how deeply nested the page is:
 
 ```md
 ![@image/screenshot.png](@image/screenshot.png)
 ```
 
-Both forms are equivalent:
+The alias always resolves to the configured images directory (default `_images`), so a page five levels deep does not need `../../../../_images/screenshot.png`.
 
-```md
-![@image/screenshot.png](@image/screenshot.png)
-![@images/screenshot.png](@images/screenshot.png)
-```
-
-This is the recommended way to reference images. A page five directories deep does not need `../../../../_images/screenshot.png` — `@image/screenshot.png` always works.
-
-### Using relative paths
+### Relative paths
 
 If you prefer relative paths, reference images relative to the current document:
 
@@ -318,44 +237,28 @@ From a page inside a subdirectory (e.g. `getting-started/installation.md`):
 ![Screenshot](../_images/screenshot.png)
 ```
 
-The package rewrites all relative image paths to the correct served URL automatically.
+All relative image paths are rewritten to the correct served URL automatically.
 
-### External and absolute image URLs
+### External and absolute URLs
 
-URLs that start with a protocol (`https://`), an absolute path (`/`), or a data URI (`data:`) are left unchanged and served as-is.
+URLs starting with a protocol (`https://`), an absolute path (`/`), or a data URI (`data:`) are left unchanged.
 
 ### Supported extensions
 
-By default: `jpg`, `jpeg`, `png`, `gif`, `webp`, `svg`, `ico`.
-
-You may extend or restrict this list in `config/manual.php`:
-
-```php
-'images' => [
-    'enabled'    => true,
-    'path'       => '_images',
-    'extensions' => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'ico'],
-],
-```
+By default: `jpg`, `jpeg`, `png`, `gif`, `webp`, `svg`, `ico`. Extend or restrict the list in `config/manual.php` under `images.extensions`.
 
 ---
 
 ## Linking Between Pages
 
-### Relative Markdown links
-
-You may link to other pages using standard relative Markdown links with `.md` extensions. The package rewrites them to the correct public URL at render time:
+Link to other pages using standard relative Markdown links with `.md` extensions. The package rewrites them to the correct public URL at render time:
 
 ```md
 [Installation](../getting-started/installation.md)
 [Caching](../advanced/caching.md)
 ```
 
-Links are resolved relative to the current document's location, so `../` navigates up one directory as expected.
-
-### Linking to sections
-
-You can append a hash fragment to any link and it will be preserved:
+Hash fragments are preserved:
 
 ```md
 [Front Matter — Order field](../guides/front-matter.md#order)
@@ -387,11 +290,11 @@ Generates a URL for a documentation page using its `key` front matter value. Thi
 [Authentication]({{ doc('guides.authentication') }})
 ```
 
-This requires the target document to have `key: guides.authentication` in its front matter.
+The target document must have `key: guides.authentication` in its front matter.
 
 ### `doc_public()`
 
-Generates a URL for a documentation page using its public route path (the URL path relative to the prefix):
+Generates a URL for a documentation page using its public route path relative to the prefix:
 
 ```md
 [Caching]({{ doc_public('advanced/caching') }})
@@ -401,9 +304,7 @@ Generates a URL for a documentation page using its public route path (the URL pa
 
 ## Search
 
-The package exposes a JSON endpoint that powers client-side search. It is enabled by default and accessible at `/{prefix}/_manual/search.json`.
-
-The search index includes every visible document. Hidden documents are excluded. Each entry contains:
+The package exposes a JSON endpoint at `/{prefix}/_manual/search.json` that powers client-side search. Hidden documents are excluded. Each entry contains:
 
 | Field | Description |
 |---|---|
@@ -414,34 +315,21 @@ The search index includes every visible document. Hidden documents are excluded.
 | `content` | The full plain text content of the document. |
 | `url` | The absolute URL of the document. |
 
-### Configuration
-
-```php
-'search' => [
-    'enabled'  => true,
-    'endpoint' => '_manual/search.json',
-],
-```
-
-The endpoint path is reserved while search is enabled. If you change it, ensure it does not conflict with any document URL.
+Configure the endpoint path under `search.endpoint` in `config/manual.php`. The path is reserved while search is enabled, so ensure it does not conflict with any document URL.
 
 ---
 
 ## Caching
 
-The package maintains two independent cache layers, both using the Laravel cache store of your choice.
+The package maintains two independent cache layers.
 
 ### Manifest cache
 
-The manifest cache holds the entire scanned document graph: every document descriptor, route lookup tables, and the navigation tree. Its cache key is derived from the source path and an **inventory signature** built from the path and modification time (`mtime`) of every file in the source directory.
-
-**Any file added, removed, or modified automatically invalidates the manifest** on the next request — no manual intervention needed in development.
+Holds the entire scanned document graph: every document descriptor, route lookup tables, and the navigation tree. Its key is derived from the source path and an **inventory signature** built from the path and modification time of every file. Any file added, removed, or modified automatically invalidates the manifest on the next request.
 
 ### Page and search cache
 
-Each rendered page is cached individually, keyed on the document's relative path, its `mtime`, and a fingerprint of the active Laravel routes. The search index is cached separately under a similar key.
-
-Changing a single file invalidates only that file's page cache; the rest of the site remains cached.
+Each rendered page is cached individually, keyed on the document's relative path, its modification time, and a fingerprint of the active Laravel routes. The search index is cached under a similar key. Changing a single file invalidates only that file's page cache; the rest of the site remains cached.
 
 ### Cache configuration
 
@@ -454,19 +342,9 @@ Changing a single file invalidates only that file's page cache; the rest of the 
 |---|---|
 | `3600` (default) | Cached for one hour, then re-rendered on the next request. |
 | `null` | Cached forever; invalidated only by file changes or `manual:clear`. |
-| `0` or negative | Cache bypassed entirely — every request re-renders. Useful in development. |
+| `0` or negative | Cache bypassed entirely. Useful in local development. |
 
-To disable caching during local development, add to your `.env`:
-
-```env
-MANUAL_CACHE_STORE=array
-```
-
-Or set a negative TTL in `config/manual.php`:
-
-```php
-'cache_ttl' => -1,
-```
+To disable caching locally, set a negative TTL in `config/manual.php` or point `MANUAL_CACHE_STORE` to the `array` driver in `.env`.
 
 ---
 
@@ -474,21 +352,16 @@ Or set a negative TTL in `config/manual.php`:
 
 ### `manual:init`
 
-Scaffolds the default documentation structure in your `source_path`. Creates an `_images` directory, an `index.md`, and a set of example pages organized in three sections (`getting-started`, `guides`, `advanced`).
+Scaffolds the default documentation structure in your `source_path`. Creates an `_images` directory, a root `index.md`, and example pages organized in three sections (`getting-started`, `guides`, `advanced`).
 
 ```bash
 php artisan manual:init
-```
-
-Use `--force` to overwrite any files that already exist:
-
-```bash
-php artisan manual:init --force
+php artisan manual:init --force   # overwrite existing files
 ```
 
 ### `manual:make`
 
-Creates a single new Markdown document at the given path relative to `source_path`. The command writes a front matter block and an `# Heading` derived from the filename.
+Creates a single new Markdown document at the given path relative to `source_path`.
 
 ```bash
 php artisan manual:make guides/authentication
@@ -500,14 +373,14 @@ Available options:
 |---|---|
 | `--title=` | The page title written to front matter and the H1 heading. |
 | `--slug=` | Sets the `slug` front matter value. |
-| `--url=` | Sets the `url` (full route path override) front matter value. |
+| `--url=` | Sets the `url` front matter value (full route path override). |
 | `--order=` | Sets the `order` front matter value (integer). |
 | `--description=` | Sets the `description` front matter value. |
 | `--key=` | Sets the `key` front matter value. |
-| `--hidden` | Marks the document as hidden in front matter. |
+| `--hidden` | Marks the document as `hidden: true` in front matter. |
 | `--force` | Overwrites the file if it already exists. |
 
-Example with multiple options:
+Example:
 
 ```bash
 php artisan manual:make guides/authentication \
@@ -519,13 +392,11 @@ php artisan manual:make guides/authentication \
 
 ### `manual:build`
 
-Warms the manifest cache, renders and caches every page, and builds the search index. Run this after deploying or after making structural changes (new files, renamed files, updated front matter):
+Warms the manifest cache, renders and caches every page, and builds the search index. Run this after deploying or after structural changes (new files, renamed files, updated front matter):
 
 ```bash
 php artisan manual:build
 ```
-
-Output example:
 
 ```
 Manual build complete: 14 documents scanned, 13 visible, 13 cached pages, 13 search documents.
@@ -533,7 +404,7 @@ Manual build complete: 14 documents scanned, 13 visible, 13 cached pages, 13 sea
 
 ### `manual:clear`
 
-Flushes every cache key managed by the package. The next request will re-scan, re-render, and re-cache everything:
+Flushes every cache key managed by the package. The next request will re-scan, re-render, and re-cache everything.
 
 ```bash
 php artisan manual:clear
@@ -542,8 +413,6 @@ php artisan manual:clear
 ---
 
 ## Configuration Reference
-
-After publishing the config file with `php artisan vendor:publish --tag=manual-config`, you will find `config/manual.php`:
 
 ```php
 return [
@@ -638,49 +507,16 @@ return [
 ];
 ```
 
-### Key reference
-
-| Key | Default | Description |
-|---|---|---|
-| `source_path` | `docs/manual` | The directory scanned for `.md` files. |
-| `route_prefix` | `manual` | URL prefix for all documentation routes. Empty string serves at the root. |
-| `site_title` | `APP_NAME` | Shown in browser tab and error pages. |
-| `cache_store` | `null` | Laravel cache store name. `null` uses the default. |
-| `cache_ttl` | `3600` | Cache lifetime in seconds. `null` = forever, `0` or negative = disabled. |
-| `view` | `manual::page` | Blade view for rendering pages. |
-| `middleware` | `['web']` | Middleware applied to all routes including images. |
-| `assets.enabled` | `true` | Whether to inject the bundled CSS and JS. |
-| `search.enabled` | `true` | Whether to expose the JSON search endpoint. |
-| `search.endpoint` | `_manual/search.json` | Path of the search JSON endpoint (relative to the route prefix). |
-| `images.enabled` | `true` | Whether to serve images from `source_path`. |
-| `images.path` | `_images` | Subdirectory inside `source_path` where images are stored. |
-| `images.extensions` | `[...]` | Allowed image file extensions. |
-
 ---
 
 ## Customization
 
-### Publishing resources
-
-You may publish any combination of the package's resources:
-
-```bash
-# Configuration
-php artisan vendor:publish --tag=manual-config
-
-# Blade views
-php artisan vendor:publish --tag=manual-views
-
-# Compiled CSS and JS assets
-php artisan vendor:publish --tag=manual-assets
-```
-
 ### Replacing the Blade view
 
-Publish the views and edit `resources/views/vendor/manual/page.blade.php`. Then point the package to your view:
+Publish the views, edit `resources/views/vendor/manual/page.blade.php`, then point the `view` config key to your customized template:
 
-```php
-'view' => 'manual::page', // or 'your-view-name' after publishing
+```bash
+php artisan vendor:publish --tag=manual-views
 ```
 
 The view receives these variables:
@@ -697,6 +533,12 @@ The view receives these variables:
 | `$searchEndpoint` | `string\|null` | The search JSON endpoint URL, or `null` if search is disabled. |
 | `$assetsEnabled` | `bool` | Whether the bundled assets should be injected. |
 
+To replace the compiled CSS and JS entirely, publish the assets and set `assets.enabled` to `false`:
+
+```bash
+php artisan vendor:publish --tag=manual-assets
+```
+
 ### Protecting documentation with authentication
 
 Set the `middleware` config key to add your authentication middleware to every documentation and image route:
@@ -705,17 +547,13 @@ Set the `middleware` config key to add your authentication middleware to every d
 'middleware' => ['web', 'auth'],
 ```
 
-For more granular control, you may add any middleware stack that Laravel supports.
-
 ### Using a different source directory
 
-Point `source_path` to any directory in your application:
+Point `source_path` to any directory — both absolute and relative paths (resolved from `base_path()`) are supported:
 
 ```php
 'source_path' => storage_path('docs'),
 ```
-
-Both absolute and relative paths are supported. Relative paths are resolved from `base_path()`.
 
 ---
 

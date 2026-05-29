@@ -8,7 +8,7 @@ description: Install the package and publish the assets you want to customize.
 Install the package with Composer:
 
 ```bash
-composer require serveracloud/manual
+composer require affonsopaulo/manual
 ```
 
 Publish the configuration file when you need to override defaults:

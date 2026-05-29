@@ -5,11 +5,11 @@ description: Ship a polished documentation area from Markdown files inside your 
 
 # Servera Manual
 
-[![Latest Version](https://img.shields.io/packagist/v/serveracloud/manual)](https://packagist.org/packages/serveracloud/manual)
-[![PHP Version](https://img.shields.io/packagist/php-v/serveracloud/manual)](https://packagist.org/packages/serveracloud/manual)
-[![License](https://img.shields.io/packagist/l/serveracloud/manual)](https://packagist.org/packages/serveracloud/manual)
+[![Latest Version](https://img.shields.io/packagist/v/affonsopaulo/manual)](https://packagist.org/packages/affonsopaulo/manual)
+[![PHP Version](https://img.shields.io/packagist/php-v/affonsopaulo/manual)](https://packagist.org/packages/affonsopaulo/manual)
+[![License](https://img.shields.io/packagist/l/affonsopaulo/manual)](https://packagist.org/packages/affonsopaulo/manual)
 
-Welcome to the default manual scaffold for `serveracloud/manual`.
+Welcome to the default manual scaffold for `affonsopaulo/manual`.
 
 - Serve Markdown files as a documentation website.
 - Organize pages by directories and `index.md` files.
