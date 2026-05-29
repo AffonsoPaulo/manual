@@ -21,6 +21,7 @@ final class DocumentScanner {
     public function __construct(
         private readonly Filesystem $files,
         private readonly ConfigRepository $config,
+        private readonly ManualPathResolver $pathResolver,
         private readonly FrontMatterParser $frontMatterParser,
         private readonly ContentMetadataExtractor $contentMetadataExtractor,
         private readonly MarkdownHelperResolver $markdownHelperResolver,
@@ -261,13 +262,7 @@ final class DocumentScanner {
     }
 
     public function sourcePath(): string {
-        $configured = (string) $this->config->get('manual.source_path', 'docs/manual');
-
-        if ($this->isAbsolutePath($configured)) {
-            return rtrim($configured, DIRECTORY_SEPARATOR);
-        }
-
-        return rtrim(base_path($configured), DIRECTORY_SEPARATOR);
+        return $this->pathResolver->sourcePath();
     }
 
     /**
@@ -600,9 +595,5 @@ final class DocumentScanner {
 
     private function normalizePath(string $path): string {
         return trim(str_replace('\\', '/', $path), '/');
-    }
-
-    private function isAbsolutePath(string $path): bool {
-        return str_starts_with($path, DIRECTORY_SEPARATOR) || (bool) preg_match('/^[A-Za-z]:[\\\\\\/]/', $path);
     }
 }

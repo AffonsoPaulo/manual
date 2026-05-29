@@ -19,10 +19,13 @@ use ServeraCloud\Manual\Services\ContentMetadataExtractor;
 use ServeraCloud\Manual\Services\DocumentScanner;
 use ServeraCloud\Manual\Services\FrontMatterParser;
 use ServeraCloud\Manual\Services\ManualCache;
+use ServeraCloud\Manual\Services\ManualPathResolver;
 use ServeraCloud\Manual\Services\ManualRepository;
 use ServeraCloud\Manual\Services\MarkdownHelperResolver;
 use ServeraCloud\Manual\Services\MarkdownRenderer;
 use ServeraCloud\Manual\Services\SearchIndexer;
+use ServeraCloud\Manual\Console\InitDocCommand;
+use ServeraCloud\Manual\Console\MakeDocCommand;
 
 final class ManualServiceProvider extends ServiceProvider {
     public function register(): void {
@@ -30,11 +33,17 @@ final class ManualServiceProvider extends ServiceProvider {
 
         $this->app->singleton(FrontMatterParser::class, fn(): FrontMatterParser => new FrontMatterParser());
         $this->app->singleton(ContentMetadataExtractor::class, fn(): ContentMetadataExtractor => new ContentMetadataExtractor());
+        $this->app->singleton(ManualPathResolver::class, function (): ManualPathResolver {
+            return new ManualPathResolver(
+                config: $this->app->make(ConfigRepository::class),
+            );
+        });
 
         $this->app->singleton(DocumentScanner::class, function (): DocumentScanner {
             return new DocumentScanner(
                 files: $this->app->make(Filesystem::class),
                 config: $this->app->make(ConfigRepository::class),
+                pathResolver: $this->app->make(ManualPathResolver::class),
                 frontMatterParser: $this->app->make(FrontMatterParser::class),
                 contentMetadataExtractor: $this->app->make(ContentMetadataExtractor::class),
                 markdownHelperResolver: $this->app->make(MarkdownHelperResolver::class),
@@ -91,6 +100,8 @@ final class ManualServiceProvider extends ServiceProvider {
             $this->commands([
                 BuildManualCommand::class,
                 ClearManualCommand::class,
+                InitDocCommand::class,
+                MakeDocCommand::class,
             ]);
         }
 
