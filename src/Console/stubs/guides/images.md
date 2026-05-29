@@ -23,13 +23,15 @@ From a page inside a subdirectory (e.g., `getting-started/installation.md`), use
 
 ## The `@image/` Alias
 
-Instead of writing paths relative to each document, use the `@image/` alias to reference images from any page regardless of depth:
+Instead of writing paths relative to each document, use the `@image/` (or `@images/`) alias to reference images from any page regardless of depth:
 
 ```md
 ![@image/screenshot.png](@image/screenshot.png)
+
+![@images/screenshot.png](@images/screenshot.png)
 ```
 
-The alias always resolves to the configured `images.path` directory (default `_images`). This is especially useful in deeply nested pages where relative paths like `../../_images/...` become hard to maintain.
+Both forms are equivalent. The alias always resolves to the configured `images.path` directory (default `_images`). This is especially useful in deeply nested pages where relative paths like `../../_images/...` become hard to maintain.
 
 ## Supported Extensions
 

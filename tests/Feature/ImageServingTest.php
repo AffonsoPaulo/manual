@@ -183,4 +183,22 @@ final class ImageServingTest extends TestCase {
             ->assertOk()
             ->assertSee('src="@image/"', false);
     }
+
+    public function test_at_images_plural_alias_resolves_from_root_document(): void {
+        $this->writeImage('logo.png');
+        $this->writeDoc('index.md', "# Home\n\n![Logo](@images/logo.png)");
+
+        $this->get('/manual')
+            ->assertOk()
+            ->assertSee('src="' . route('manual.image', ['path' => '_images/logo.png']) . '"', false);
+    }
+
+    public function test_at_images_plural_alias_resolves_from_subdirectory(): void {
+        $this->writeImage('logo.png');
+        $this->writeDoc('getting-started/deep/page.md', "# Deep\n\n![Logo](@images/logo.png)");
+
+        $this->get('/manual/getting-started/deep/page')
+            ->assertOk()
+            ->assertSee('src="' . route('manual.image', ['path' => '_images/logo.png']) . '"', false);
+    }
 }

@@ -202,8 +202,14 @@ final class MarkdownRenderer {
                 continue;
             }
 
-            if (str_starts_with($src, '@image/')) {
-                $remainder = ltrim(substr($src, strlen('@image/')), '/');
+            $aliasLength = match(true) {
+                str_starts_with($src, '@image/') => strlen('@image/'),
+                str_starts_with($src, '@images/') => strlen('@images/'),
+                default => null,
+            };
+
+            if ($aliasLength !== null) {
+                $remainder = ltrim(substr($src, $aliasLength), '/');
                 if ($remainder !== '') {
                     $node->setAttribute('src', $imageUrlGenerator($src));
                 }
