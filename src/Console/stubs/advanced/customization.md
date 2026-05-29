@@ -7,7 +7,7 @@ key: advanced.customization
 
 # Customization
 
-Servera Manual is designed to work out of the box, but every visual and behavioral aspect can be overridden.
+Manual is designed to work out of the box, but every visual and behavioral aspect can be overridden.
 
 ---
 

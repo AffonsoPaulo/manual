@@ -1,6 +1,6 @@
 ---
 title: Front Matter
-description: Reference for every YAML front matter field supported by Servera Manual.
+description: Reference for every YAML front matter field supported by Manual.
 order: 1
 key: guides.front-matter
 ---

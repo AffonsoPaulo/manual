@@ -7,7 +7,7 @@ key: advanced.caching
 
 # Caching
 
-Servera Manual uses two independent cache layers to keep responses fast without needing a dedicated cache server or queue worker.
+Manual uses two independent cache layers to keep responses fast without needing a dedicated cache server or queue worker.
 
 ---
 

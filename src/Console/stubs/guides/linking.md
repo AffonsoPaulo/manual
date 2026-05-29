@@ -7,7 +7,7 @@ key: guides.linking
 
 # Linking
 
-There are two ways to link to other pages in Servera Manual: **relative Markdown links** and **dynamic helpers**.
+There are two ways to link to other pages in Manual: **relative Markdown links** and **dynamic helpers**.
 
 ---
 

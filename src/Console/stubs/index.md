@@ -1,17 +1,17 @@
 ---
-title: Servera Manual
+title: Manual
 description: A Laravel package that turns a directory of Markdown files into a fully-rendered, searchable documentation site.
 order: 0
 key: home
 ---
 
-# Servera Manual
+# Manual
 
 [![Latest Version](https://img.shields.io/packagist/v/affonsopaulo/manual)](https://packagist.org/packages/affonsopaulo/manual)
 [![PHP Version](https://img.shields.io/packagist/php-v/affonsopaulo/manual)](https://packagist.org/packages/affonsopaulo/manual)
 [![License](https://img.shields.io/packagist/l/affonsopaulo/manual)](https://packagist.org/packages/affonsopaulo/manual)
 
-Servera Manual turns a directory of Markdown files into a fully-rendered, searchable documentation site — self-hosted inside your Laravel application. No build step, no Node.js, no database required.
+Manual turns a directory of Markdown files into a fully-rendered, searchable documentation site — self-hosted inside your Laravel application. No build step, no Node.js, no database required.
 
 ## How It Works
 

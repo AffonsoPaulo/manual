@@ -1,6 +1,6 @@
 ---
 title: Installation
-description: Step-by-step guide to installing Servera Manual in a Laravel application.
+description: Step-by-step guide to installing Manual in a Laravel application.
 order: 1
 key: getting-started.installation
 ---

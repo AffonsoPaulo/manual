@@ -7,7 +7,7 @@ key: advanced.search
 
 # Search
 
-Servera Manual exposes a JSON endpoint that you can use to power client-side full-text search. No search server or external service is required.
+Manual exposes a JSON endpoint that you can use to power client-side full-text search. No search server or external service is required.
 
 ---
 

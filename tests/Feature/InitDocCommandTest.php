@@ -49,7 +49,7 @@ final class InitDocCommandTest extends TestCase {
             ->expectsOutputToContain('overwritten')
             ->assertSuccessful();
 
-        $this->assertStringContainsString('Servera Manual', $this->readDoc('index.md'));
+        $this->assertStringContainsString('Manual', $this->readDoc('index.md'));
         $this->assertSame("# Keep Me\n", $this->readDoc('custom.md'));
     }
 

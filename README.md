@@ -1,4 +1,4 @@
-# Servera Manual
+# Manual
 
 [![Latest Version](https://img.shields.io/packagist/v/affonsopaulo/manual)](https://packagist.org/packages/affonsopaulo/manual)
 [![PHP Version](https://img.shields.io/packagist/php-v/affonsopaulo/manual)](https://packagist.org/packages/affonsopaulo/manual)
@@ -30,7 +30,7 @@ A Laravel package that turns a directory of Markdown files into a fully-rendered
 
 ## Introduction
 
-Servera Manual scans a directory tree of Markdown files and serves them as a styled documentation site — similar to GitBook or Mintlify, but self-hosted inside your Laravel application. Every URL, navigation item, breadcrumb, previous/next link, and search entry is derived automatically from the file system and optional YAML front matter you add to each file.
+Manual scans a directory tree of Markdown files and serves them as a styled documentation site — similar to GitBook or Mintlify, but self-hosted inside your Laravel application. Every URL, navigation item, breadcrumb, previous/next link, and search entry is derived automatically from the file system and optional YAML front matter you add to each file.
 
 ---
 
@@ -558,4 +558,4 @@ Point `source_path` to any directory — both absolute and relative paths (resol
 
 ## License
 
-Servera Manual is open-source software licensed under the [MIT license](LICENSE).
+Manual is open-source software licensed under the [MIT license](LICENSE).

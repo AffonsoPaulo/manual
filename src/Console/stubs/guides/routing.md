@@ -7,7 +7,7 @@ key: guides.routing
 
 # Routing
 
-Servera Manual derives every public URL directly from the file and directory layout inside `source_path`. No route declarations are needed — the file system is the router.
+Manual derives every public URL directly from the file and directory layout inside `source_path`. No route declarations are needed — the file system is the router.
 
 ---
 
