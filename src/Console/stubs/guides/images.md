@@ -1,41 +1,89 @@
 ---
 title: Images
-description: Add images to your documentation pages.
+description: Add images to your documentation pages using the @image/ alias or relative paths.
+order: 5
+key: guides.images
 ---
 
 # Images
 
-Place image files inside the `_images/` directory at the root of your documentation source path. The package serves them automatically under the same URL prefix and middleware as your documents.
+Place image files inside the `_images` directory at the root of your `source_path`:
 
-## Adding an Image
+```
+docs/manual/
+└── _images/
+    ├── screenshot.png
+    ├── banner.webp
+    └── icons/
+        └── arrow.svg
+```
 
-Use standard Markdown image syntax and reference the image relative to the current document:
+The package serves images automatically through the same URL prefix and middleware as your documents. No separate routes or controllers need to be configured.
+
+---
+
+## The `@image/` alias
+
+The recommended way to reference images is the `@image/` alias. It always resolves to the configured images directory, regardless of how deeply nested the current page is:
+
+```md
+![@image/screenshot.png](@image/screenshot.png)
+![@image/icons/arrow.svg](@image/icons/arrow.svg)
+```
+
+`@images/` (plural) works identically:
+
+```md
+![@images/screenshot.png](@images/screenshot.png)
+```
+
+**Why use the alias?**
+
+Without it, a page at `advanced/caching.md` would need `../_images/screenshot.png`, while a page at `guides/linking.md` would need the same `../_images/screenshot.png`. These relative paths are easy to get wrong and break when you move files. The `@image/` alias makes every image reference the same regardless of where the page lives.
+
+---
+
+## Relative paths
+
+If you prefer relative paths, reference images relative to the current document's location:
 
 ```md
 ![Screenshot](_images/screenshot.png)
 ```
 
-From a page inside a subdirectory (e.g., `getting-started/installation.md`), use a relative path:
+From a page inside a subdirectory (e.g. `getting-started/installation.md`):
 
 ```md
 ![Screenshot](../_images/screenshot.png)
 ```
 
-## The `@image/` Alias
+The package resolves all relative image paths and rewrites the `src` attribute to the correct served URL automatically.
 
-Instead of writing paths relative to each document, use the `@image/` (or `@images/`) alias to reference images from any page regardless of depth:
+---
 
-```md
-![@image/screenshot.png](@image/screenshot.png)
+## External and absolute URLs
 
-![@images/screenshot.png](@images/screenshot.png)
+The following are passed through **unchanged** and served as-is:
+
+- URLs with a protocol: `https://example.com/image.png`
+- Absolute paths: `/public/logo.png`
+- Data URIs: `data:image/png;base64,...`
+
+---
+
+## Supported extensions
+
+By default the package serves: `jpg`, `jpeg`, `png`, `gif`, `webp`, `svg`, `ico`.
+
+Requests for any other extension return a 404, even if the file exists on disk. Extend the list in `config/manual.php`:
+
+```php
+'images' => [
+    'extensions' => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'ico', 'avif'],
+],
 ```
 
-Both forms are equivalent. The alias always resolves to the configured `images.path` directory (default `_images`). This is especially useful in deeply nested pages where relative paths like `../../_images/...` become hard to maintain.
-
-## Supported Extensions
-
-By default, the following formats are accepted: `jpg`, `jpeg`, `png`, `gif`, `webp`, `svg`, `ico`.
+---
 
 ## Configuration
 
@@ -43,16 +91,26 @@ By default, the following formats are accepted: `jpg`, `jpeg`, `png`, `gif`, `we
 // config/manual.php
 'images' => [
     'enabled'    => true,
-    'path'       => '_images',  // folder name, relative to source_path
+    'path'       => '_images',
     'extensions' => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'ico'],
 ],
 ```
 
-Change `images.path` to use a different folder name. Set `images.enabled` to `false` to disable image serving entirely.
+| Key | Description |
+|---|---|
+| `images.enabled` | Set to `false` to disable image serving entirely. `@image/` aliases will not be rewritten and image routes will return 404. |
+| `images.path` | The subdirectory inside `source_path` where images are stored. Must be a relative path. |
+| `images.extensions` | The allowlist of file extensions the image controller will serve. |
 
-## Notes
+---
 
-- External image URLs (`https://...`) are left unchanged.
-- Absolute paths (`/public/...`) are left unchanged.
-- Inline `data:` URIs are left unchanged.
-- Images inherit the same middleware as your documents. If access to your manual requires authentication, images do too.
+## Security
+
+The image controller validates every request before serving a file:
+
+- **Null bytes** in the path are rejected immediately.
+- **Path traversal** segments (`.` and `..`) are rejected — it is not possible to escape the images directory.
+- The **resolved file path** is verified to be inside `images.path` using `realpath()`.
+- The **MIME type** of the file is verified to start with `image/` using PHP's `finfo` extension.
+
+Images inherit the same middleware as your documents, including any authentication middleware you have configured.
