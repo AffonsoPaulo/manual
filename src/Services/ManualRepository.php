@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ServeraCloud\Manual\Services;
 
+use Closure;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Route;
@@ -46,7 +47,7 @@ final class ManualRepository {
                 (string) $document->fileMtime,
             ),
             fn(): array => [
-                'html' => $this->renderer->render($document, $manifest, fn(string $path): string => $this->documentUrl($path)),
+                'html' => $this->renderer->render($document, $manifest, fn(string $path): string => $this->documentUrl($path), $this->imageUrlGenerator()),
             ],
         );
 
@@ -305,6 +306,18 @@ final class ManualRepository {
         return $entries;
     }
 
+    private function imageUrlGenerator(): ?Closure {
+        if (! (bool) $this->config->get('manual.images.enabled', true)) {
+            return null;
+        }
+
+        if (! Route::has('manual.image')) {
+            return null;
+        }
+
+        return fn(string $path): string => route('manual.image', ['path' => $path]);
+    }
+
     private function documentUrl(string $routePath): string {
         return route('manual.document', [
             'path' => $routePath === '' ? null : $routePath,
@@ -360,6 +373,8 @@ final class ManualRepository {
             (string) $this->config->get('manual.route_prefix', 'manual'),
             (string) $this->config->get('manual.search.endpoint', '_manual/search.json'),
             (string) ((int) $this->config->get('manual.search.enabled', true)),
+            (string) ((int) $this->config->get('manual.images.enabled', true)),
+            (string) $this->config->get('manual.images.path', '_images'),
             $this->markdownHelperResolver->cacheFingerprint(),
         ]));
     }

@@ -30,13 +30,13 @@ final class MarkdownRenderer {
         $this->highlighter = new Highlighter();
     }
 
-    public function render(DocumentDescriptor $document, ManualManifest $manifest, Closure $urlGenerator): string {
+    public function render(DocumentDescriptor $document, ManualManifest $manifest, Closure $urlGenerator, ?Closure $imageUrlGenerator = null): string {
         $html = (string) $this->converter->convert($document->markdown);
 
-        return $this->postProcessHtml($html, $document, $manifest, $urlGenerator);
+        return $this->postProcessHtml($html, $document, $manifest, $urlGenerator, $imageUrlGenerator);
     }
 
-    private function postProcessHtml(string $html, DocumentDescriptor $document, ManualManifest $manifest, Closure $urlGenerator): string {
+    private function postProcessHtml(string $html, DocumentDescriptor $document, ManualManifest $manifest, Closure $urlGenerator, ?Closure $imageUrlGenerator): string {
         $dom = new DOMDocument('1.0', 'UTF-8');
         $previous = libxml_use_internal_errors(true);
 
@@ -58,6 +58,10 @@ final class MarkdownRenderer {
         $this->addHeadingIds($dom);
         $this->highlightCodeBlocks($dom);
         $this->rewriteInternalLinks($dom, $document, $manifest, $urlGenerator);
+
+        if ($imageUrlGenerator !== null) {
+            $this->rewriteImageSources($dom, $document, $imageUrlGenerator);
+        }
 
         return $this->innerHtml($container);
     }
@@ -176,6 +180,35 @@ final class MarkdownRenderer {
             }
 
             $node->setAttribute('href', $newHref);
+        }
+    }
+
+    private function rewriteImageSources(DOMDocument $dom, DocumentDescriptor $document, Closure $imageUrlGenerator): void {
+        $xpath = new DOMXPath($dom);
+        $nodes = $xpath->query('//img[@src]');
+
+        if ($nodes === false) {
+            return;
+        }
+
+        foreach ($nodes as $node) {
+            if (! $node instanceof DOMElement) {
+                continue;
+            }
+
+            $src = trim($node->getAttribute('src'));
+
+            if ($src === '' || str_starts_with($src, '#') || str_starts_with($src, '/') || preg_match('/^[a-z][a-z0-9+\-.]*:/i', $src)) {
+                continue;
+            }
+
+            $resolved = $this->resolveRelativeMarkdownPath($document->relativePath, $src);
+
+            if ($resolved === null) {
+                continue;
+            }
+
+            $node->setAttribute('src', $imageUrlGenerator($resolved));
         }
     }
 

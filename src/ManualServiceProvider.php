@@ -14,6 +14,7 @@ use Illuminate\Support\ServiceProvider;
 use ServeraCloud\Manual\Console\BuildManualCommand;
 use ServeraCloud\Manual\Console\ClearManualCommand;
 use ServeraCloud\Manual\Http\Controllers\DocumentController;
+use ServeraCloud\Manual\Http\Controllers\ImageController;
 use ServeraCloud\Manual\Http\Controllers\SearchIndexController;
 use ServeraCloud\Manual\Services\ContentMetadataExtractor;
 use ServeraCloud\Manual\Services\DocumentScanner;
@@ -114,13 +115,28 @@ final class ManualServiceProvider extends ServiceProvider {
         $prefix = trim((string) config('manual.route_prefix', 'manual'), '/');
         $searchEnabled = (bool) config('manual.search.enabled', true);
         $searchEndpoint = trim((string) config('manual.search.endpoint', '_manual/search.json'), '/');
+        $imagesEnabled = (bool) config('manual.images.enabled', true);
+        $imagesPath = trim((string) config('manual.images.path', '_images'), '/\\');
+        $imagesExtensions = (array) config('manual.images.extensions', ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'ico']);
+
+        if ($imagesPath === '' || $this->isAbsolutePath($imagesPath)) {
+            $imagesPath = '_images';
+        }
+
+        $imageConstraint = preg_quote($imagesPath, '#') . '/.*\.(' . implode('|', array_map(fn(string $ext): string => preg_quote($ext, '#'), $imagesExtensions)) . ')';
 
         Route::middleware((array) config('manual.middleware', ['web']))
             ->as('manual.')
-            ->group(function () use ($prefix, $searchEnabled, $searchEndpoint): void {
-                $register = function () use ($searchEnabled, $searchEndpoint): void {
+            ->group(function () use ($prefix, $searchEnabled, $searchEndpoint, $imagesEnabled, $imagesPath, $imageConstraint): void {
+                $register = function () use ($searchEnabled, $searchEndpoint, $imagesEnabled, $imagesPath, $imageConstraint): void {
                     if ($searchEnabled && $searchEndpoint !== '') {
                         Route::get($searchEndpoint, SearchIndexController::class)->name('search');
+                    }
+
+                    if ($imagesEnabled && $imagesPath !== '') {
+                        Route::get('/{path}', ImageController::class)
+                            ->where('path', $imageConstraint)
+                            ->name('image');
                     }
 
                     Route::get('/{path?}', DocumentController::class)
@@ -136,6 +152,10 @@ final class ManualServiceProvider extends ServiceProvider {
 
                 Route::prefix($prefix)->group($register);
             });
+    }
+
+    private function isAbsolutePath(string $path): bool {
+        return str_starts_with($path, DIRECTORY_SEPARATOR) || (bool) preg_match('/^[A-Za-z]:[\\\\\\/]/', $path);
     }
 
     private function packagePath(string $path): string {

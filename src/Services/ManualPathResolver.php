@@ -24,6 +24,16 @@ final class ManualPathResolver {
         return rtrim(base_path($configured), DIRECTORY_SEPARATOR);
     }
 
+    public function imagesPath(): string {
+        $configured = trim((string) $this->config->get('manual.images.path', '_images'), '/\\');
+
+        if ($configured === '' || $this->isAbsolutePath($configured)) {
+            $configured = '_images';
+        }
+
+        return $this->sourcePath() . DIRECTORY_SEPARATOR . $configured;
+    }
+
     public function resolveDocumentPath(string $path): ResolvedDocumentPath {
         $normalized = $this->normalizeDocumentPath($path);
         $absolutePath = $this->joinPaths($this->sourcePath(), $normalized);

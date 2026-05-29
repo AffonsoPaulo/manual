@@ -25,4 +25,10 @@ return [
         'enabled' => true,
         'endpoint' => '_manual/search.json',
     ],
+
+    'images' => [
+        'enabled'    => true,
+        'path'       => '_images',
+        'extensions' => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'ico'],
+    ],
 ];

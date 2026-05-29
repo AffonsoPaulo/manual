@@ -23,6 +23,7 @@ final class InitDocCommand extends Command {
         'guides/routing.md',
         'guides/navigation.md',
         'guides/linking.md',
+        'guides/images.md',
         'advanced/index.md',
         'advanced/caching.md',
         'advanced/search.md',
@@ -34,6 +35,13 @@ final class InitDocCommand extends Command {
     protected $description = 'Create the default manual documentation scaffold.';
 
     public function handle(Filesystem $files, ManualPathResolver $paths): int {
+        $imagesDir = $paths->imagesPath();
+
+        if (! $files->isDirectory($imagesDir)) {
+            $files->makeDirectory($imagesDir, 0755, true);
+            $this->line('<info>created</info> ' . basename($imagesDir) . '/');
+        }
+
         $created = 0;
         $overwritten = 0;
         $skipped = 0;
