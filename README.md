@@ -32,13 +32,6 @@ A Laravel package that turns a directory of Markdown files into a fully-rendered
 
 Servera Manual scans a directory tree of Markdown files and serves them as a styled documentation site — similar to GitBook or Mintlify, but self-hosted inside your Laravel application. Every URL, navigation item, breadcrumb, previous/next link, and search entry is derived automatically from the file system and optional YAML front matter you add to each file.
 
-**How it works at a glance:**
-
-1. You write plain `.md` files inside a directory of your choice (default: `docs/manual`).
-2. On request, the package scans the directory once, builds a navigation manifest, renders Markdown to HTML, and caches the result.
-3. A `DocumentController` handles every URL under the configured prefix and serves the rendered Blade view.
-4. Images, search JSON, and assets each have their own dedicated controllers.
-
 ---
 
 ## Installation
@@ -143,7 +136,6 @@ description: Learn how to protect your documentation behind authentication.
 key: guides.authentication
 hidden: false
 ---
-
 # Authentication Guide
 
 Your content here.
@@ -151,15 +143,15 @@ Your content here.
 
 ### Available fields
 
-| Field | Type | Description |
-|---|---|---|
-| `title` | string | The page title shown in navigation and the browser tab. Falls back to the first `# h1` heading, then the formatted filename. |
-| `slug` | string | Replaces only the **last URL segment** while keeping the rest of the path. `guides/installation.md` with `slug: setup` becomes `/manual/guides/setup`. |
-| `url` | string | Replaces the **entire relative route path**. `guides/installation.md` with `url: reference/install` becomes `/manual/reference/install` regardless of its directory. |
-| `order` | integer | Controls navigation sort order (ascending). Pages without an `order` value sort alphabetically after ordered pages. |
-| `description` | string | Short summary shown in search results and used as the excerpt in the search index. |
-| `key` | string | A stable dot-notation identifier (e.g. `guides.authentication`) for use with the `{{ doc('...') }}` helper. |
-| `hidden` | boolean | When `true`, the page is excluded from navigation and the search index but remains accessible by its URL. Useful for draft or unlisted pages. |
+| Field         | Type    | Description                                                                                                                                                          |
+| ------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `title`       | string  | The page title shown in navigation and the browser tab. Falls back to the first `# h1` heading, then the formatted filename.                                         |
+| `slug`        | string  | Replaces only the **last URL segment** while keeping the rest of the path. `guides/installation.md` with `slug: setup` becomes `/manual/guides/setup`.               |
+| `url`         | string  | Replaces the **entire relative route path**. `guides/installation.md` with `url: reference/install` becomes `/manual/reference/install` regardless of its directory. |
+| `order`       | integer | Controls navigation sort order (ascending). Pages without an `order` value sort alphabetically after ordered pages.                                                  |
+| `description` | string  | Short summary shown in search results and used as the excerpt in the search index.                                                                                   |
+| `key`         | string  | A stable dot-notation identifier (e.g. `guides.authentication`) for use with the `{{ doc('...') }}` helper.                                                          |
+| `hidden`      | boolean | When `true`, the page is excluded from navigation and the search index but remains accessible by its URL. Useful for draft or unlisted pages.                        |
 
 ### Title resolution order
 
@@ -174,12 +166,12 @@ When no `title` is set, the package resolves the title in this order:
 
 URLs are derived from the file path relative to `source_path`. The route prefix (default: `manual`) is prepended to every URL:
 
-| File | URL |
-|---|---|
-| `index.md` | `/manual` |
-| `getting-started/index.md` | `/manual/getting-started` |
-| `guides/front-matter.md` | `/manual/guides/front-matter` |
-| `advanced/caching.md` | `/manual/advanced/caching` |
+| File                       | URL                           |
+| -------------------------- | ----------------------------- |
+| `index.md`                 | `/manual`                     |
+| `getting-started/index.md` | `/manual/getting-started`     |
+| `guides/front-matter.md`   | `/manual/guides/front-matter` |
+| `advanced/caching.md`      | `/manual/advanced/caching`    |
 
 To customize how a specific document's URL is derived, use the `slug` or `url` front matter fields — see [Front Matter](#front-matter).
 
@@ -306,14 +298,14 @@ Generates a URL for a documentation page using its public route path relative to
 
 The package exposes a JSON endpoint at `/{prefix}/_manual/search.json` that powers client-side search. Hidden documents are excluded. Each entry contains:
 
-| Field | Description |
-|---|---|
-| `title` | The document title. |
-| `description` | The front matter description, if set. |
-| `headings` | A list of all heading texts in the document. |
-| `excerpt` | The first 220 characters of the description or plain text. |
-| `content` | The full plain text content of the document. |
-| `url` | The absolute URL of the document. |
+| Field         | Description                                                |
+| ------------- | ---------------------------------------------------------- |
+| `title`       | The document title.                                        |
+| `description` | The front matter description, if set.                      |
+| `headings`    | A list of all heading texts in the document.               |
+| `excerpt`     | The first 220 characters of the description or plain text. |
+| `content`     | The full plain text content of the document.               |
+| `url`         | The absolute URL of the document.                          |
 
 Configure the endpoint path under `search.endpoint` in `config/manual.php`. The path is reserved while search is enabled, so ensure it does not conflict with any document URL.
 
@@ -338,11 +330,11 @@ Each rendered page is cached individually, keyed on the document's relative path
 'cache_ttl'   => 3600,                        // seconds; null → store forever
 ```
 
-| `cache_ttl` value | Effect |
-|---|---|
-| `3600` (default) | Cached for one hour, then re-rendered on the next request. |
-| `null` | Cached forever; invalidated only by file changes or `manual:clear`. |
-| `0` or negative | Cache bypassed entirely. Useful in local development. |
+| `cache_ttl` value | Effect                                                              |
+| ----------------- | ------------------------------------------------------------------- |
+| `3600` (default)  | Cached for one hour, then re-rendered on the next request.          |
+| `null`            | Cached forever; invalidated only by file changes or `manual:clear`. |
+| `0` or negative   | Cache bypassed entirely. Useful in local development.               |
 
 To disable caching locally, set a negative TTL in `config/manual.php` or point `MANUAL_CACHE_STORE` to the `array` driver in `.env`.
 
@@ -369,16 +361,16 @@ php artisan manual:make guides/authentication
 
 Available options:
 
-| Option | Description |
-|---|---|
-| `--title=` | The page title written to front matter and the H1 heading. |
-| `--slug=` | Sets the `slug` front matter value. |
-| `--url=` | Sets the `url` front matter value (full route path override). |
-| `--order=` | Sets the `order` front matter value (integer). |
-| `--description=` | Sets the `description` front matter value. |
-| `--key=` | Sets the `key` front matter value. |
-| `--hidden` | Marks the document as `hidden: true` in front matter. |
-| `--force` | Overwrites the file if it already exists. |
+| Option           | Description                                                   |
+| ---------------- | ------------------------------------------------------------- |
+| `--title=`       | The page title written to front matter and the H1 heading.    |
+| `--slug=`        | Sets the `slug` front matter value.                           |
+| `--url=`         | Sets the `url` front matter value (full route path override). |
+| `--order=`       | Sets the `order` front matter value (integer).                |
+| `--description=` | Sets the `description` front matter value.                    |
+| `--key=`         | Sets the `key` front matter value.                            |
+| `--hidden`       | Marks the document as `hidden: true` in front matter.         |
+| `--force`        | Overwrites the file if it already exists.                     |
 
 Example:
 
@@ -521,17 +513,17 @@ php artisan vendor:publish --tag=manual-views
 
 The view receives these variables:
 
-| Variable | Type | Description |
-|---|---|---|
-| `$page` | `RenderedManualPage` | The full page DTO. |
-| `$document` | `DocumentDescriptor` | The current document's metadata. |
-| `$navigation` | `array` | The full navigation tree. |
-| `$breadcrumbs` | `array` | Breadcrumb items for the current page. |
-| `$previousPage` | `DocumentDescriptor\|null` | The previous document in reading order. |
-| `$nextPage` | `DocumentDescriptor\|null` | The next document in reading order. |
-| `$siteTitle` | `string` | The configured site title. |
-| `$searchEndpoint` | `string\|null` | The search JSON endpoint URL, or `null` if search is disabled. |
-| `$assetsEnabled` | `bool` | Whether the bundled assets should be injected. |
+| Variable          | Type                       | Description                                                    |
+| ----------------- | -------------------------- | -------------------------------------------------------------- |
+| `$page`           | `RenderedManualPage`       | The full page DTO.                                             |
+| `$document`       | `DocumentDescriptor`       | The current document's metadata.                               |
+| `$navigation`     | `array`                    | The full navigation tree.                                      |
+| `$breadcrumbs`    | `array`                    | Breadcrumb items for the current page.                         |
+| `$previousPage`   | `DocumentDescriptor\|null` | The previous document in reading order.                        |
+| `$nextPage`       | `DocumentDescriptor\|null` | The next document in reading order.                            |
+| `$siteTitle`      | `string`                   | The configured site title.                                     |
+| `$searchEndpoint` | `string\|null`             | The search JSON endpoint URL, or `null` if search is disabled. |
+| `$assetsEnabled`  | `bool`                     | Whether the bundled assets should be injected.                 |
 
 To replace the compiled CSS and JS entirely, publish the assets and set `assets.enabled` to `false`:
 
