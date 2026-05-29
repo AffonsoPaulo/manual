@@ -592,13 +592,18 @@
         .manual-article li > ol { margin-top: 0.25rem; margin-bottom: 0; }
 
         /* Tables */
+        .manual-article .manual-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
         .manual-article table {
             width: 100%;
             border-collapse: collapse;
-            margin: 1.5rem 0;
             font-size: 0.875rem;
-            border: 1px solid var(--border);
-            border-radius: 10px;
             overflow: hidden;
         }
         .manual-article th {
@@ -626,10 +631,13 @@
             border-radius: 10px;
             padding: 1.125rem 1.25rem;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
             position: relative;
             margin: 1.25rem 0;
             border: 1px solid rgba(255,255,255,0.05);
             font-size: 0.8125rem;
+            max-width: 100%;
+            min-width: 0;
         }
         .manual-article pre code {
             background: none;
@@ -764,6 +772,20 @@
 
             .manual-main { padding-top: 0; }
             .manual-content-wrap { padding: 1.5rem 1.25rem 3rem; }
+
+            /* Prevent any element from expanding the layout viewport */
+            body { overflow-x: hidden; }
+
+            /* Ensure the article and its children never exceed the column width */
+            .manual-article { min-width: 0; max-width: 100%; }
+
+            .manual-article pre {
+                max-width: calc(100vw - 2.5rem);
+            }
+
+            .manual-article .manual-table-wrap {
+                max-width: calc(100vw - 2.5rem);
+            }
         }
 
         @media (max-width: 640px) {

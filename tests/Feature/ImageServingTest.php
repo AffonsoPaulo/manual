@@ -193,6 +193,15 @@ final class ImageServingTest extends TestCase {
             ->assertSee('src="' . route('manual.image', ['path' => '_images/logo.png']) . '"', false);
     }
 
+    public function test_svg_is_served_with_attachment_content_disposition(): void {
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="red"/></svg>';
+        $this->writeImage('diagram.svg', $svg);
+
+        $this->get('/manual/_images/diagram.svg')
+            ->assertOk()
+            ->assertHeader('Content-Disposition', 'attachment; filename=diagram.svg');
+    }
+
     public function test_at_images_plural_alias_resolves_from_subdirectory(): void {
         $this->writeImage('logo.png');
         $this->writeDoc('getting-started/deep/page.md', "# Deep\n\n![Logo](@images/logo.png)");

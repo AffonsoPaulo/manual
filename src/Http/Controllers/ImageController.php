@@ -71,9 +71,15 @@ final class ImageController {
             abort(404);
         }
 
-        return response()->file($absolutePath, [
+        $headers = [
             'Content-Type'  => $mimeType,
             'Cache-Control' => 'public, max-age=31536000',
-        ]);
+        ];
+
+        if ($extension === 'svg') {
+            return response()->download($absolutePath, basename($absolutePath), $headers);
+        }
+
+        return response()->file($absolutePath, $headers);
     }
 }

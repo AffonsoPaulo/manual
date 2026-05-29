@@ -57,6 +57,7 @@ final class MarkdownRenderer {
 
         $this->addHeadingIds($dom);
         $this->highlightCodeBlocks($dom);
+        $this->wrapTables($dom);
         $this->rewriteInternalLinks($dom, $document, $manifest, $urlGenerator);
 
         if ($imageUrlGenerator !== null) {
@@ -129,6 +130,21 @@ final class MarkdownRenderer {
                 $classes = array_filter([$node->parentNode->getAttribute('class'), 'manual-code-block']);
                 $node->parentNode->setAttribute('class', implode(' ', array_unique($classes)));
             }
+        }
+    }
+
+    private function wrapTables(DOMDocument $dom): void {
+        $tables = iterator_to_array($dom->getElementsByTagName('table'));
+
+        foreach ($tables as $table) {
+            if (! $table instanceof DOMElement) {
+                continue;
+            }
+
+            $wrapper = $dom->createElement('div');
+            $wrapper->setAttribute('class', 'manual-table-wrap');
+            $table->parentNode?->insertBefore($wrapper, $table);
+            $wrapper->appendChild($table);
         }
     }
 
