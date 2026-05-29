@@ -125,4 +125,62 @@ final class ImageServingTest extends TestCase {
             ->assertOk()
             ->assertSee('src="_images/screenshot.png"', false);
     }
+
+    public function test_at_image_alias_resolves_from_root_document(): void {
+        $this->writeImage('logo.png');
+        $this->writeDoc('index.md', "# Home\n\n![Logo](@image/logo.png)");
+
+        $this->get('/manual')
+            ->assertOk()
+            ->assertSee('src="' . route('manual.image', ['path' => '_images/logo.png']) . '"', false);
+    }
+
+    public function test_at_image_alias_resolves_from_subdirectory(): void {
+        $this->writeImage('logo.png');
+        $this->writeDoc('getting-started/deep/page.md', "# Deep\n\n![Logo](@image/logo.png)");
+
+        $this->get('/manual/getting-started/deep/page')
+            ->assertOk()
+            ->assertSee('src="' . route('manual.image', ['path' => '_images/logo.png']) . '"', false);
+    }
+
+    public function test_at_image_alias_supports_subdirectory_images(): void {
+        $this->writeImage('icons/arrow.png');
+        $this->writeDoc('index.md', "# Home\n\n![Arrow](@image/icons/arrow.png)");
+
+        $this->get('/manual')
+            ->assertOk()
+            ->assertSee('src="' . route('manual.image', ['path' => '_images/icons/arrow.png']) . '"', false);
+    }
+
+    public function test_at_image_alias_not_rewritten_when_images_disabled(): void {
+        $this->app['config']->set('manual.images.enabled', false);
+        $this->writeDoc('index.md', "# Home\n\n![Logo](@image/logo.png)");
+
+        $this->get('/manual')
+            ->assertOk()
+            ->assertSee('src="@image/logo.png"', false);
+    }
+
+    public function test_at_image_alias_with_custom_images_path(): void {
+        $this->app['config']->set('manual.images.path', 'assets/imgs');
+
+        $customDir = $this->docsPath . '/assets/imgs';
+        $this->files->ensureDirectoryExists($customDir);
+        $this->files->put($customDir . '/logo.png', self::$minimalPng);
+
+        $this->writeDoc('index.md', "# Home\n\n![Logo](@image/logo.png)");
+
+        $this->get('/manual')
+            ->assertOk()
+            ->assertSee('src="' . route('manual.image', ['path' => 'assets/imgs/logo.png']) . '"', false);
+    }
+
+    public function test_at_image_alias_with_empty_remainder_is_not_rewritten(): void {
+        $this->writeDoc('index.md', "# Home\n\n![Empty](@image/)");
+
+        $this->get('/manual')
+            ->assertOk()
+            ->assertSee('src="@image/"', false);
+    }
 }

@@ -21,6 +21,16 @@ From a page inside a subdirectory (e.g., `getting-started/installation.md`), use
 ![Screenshot](../_images/screenshot.png)
 ```
 
+## The `@image/` Alias
+
+Instead of writing paths relative to each document, use the `@image/` alias to reference images from any page regardless of depth:
+
+```md
+![@image/screenshot.png](@image/screenshot.png)
+```
+
+The alias always resolves to the configured `images.path` directory (default `_images`). This is especially useful in deeply nested pages where relative paths like `../../_images/...` become hard to maintain.
+
 ## Supported Extensions
 
 By default, the following formats are accepted: `jpg`, `jpeg`, `png`, `gif`, `webp`, `svg`, `ico`.

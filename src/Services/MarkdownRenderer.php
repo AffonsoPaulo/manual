@@ -202,6 +202,14 @@ final class MarkdownRenderer {
                 continue;
             }
 
+            if (str_starts_with($src, '@image/')) {
+                $remainder = ltrim(substr($src, strlen('@image/')), '/');
+                if ($remainder !== '') {
+                    $node->setAttribute('src', $imageUrlGenerator($src));
+                }
+                continue;
+            }
+
             $resolved = $this->resolveRelativeMarkdownPath($document->relativePath, $src);
 
             if ($resolved === null) {

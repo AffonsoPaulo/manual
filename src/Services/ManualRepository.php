@@ -315,7 +315,15 @@ final class ManualRepository {
             return null;
         }
 
-        return fn(string $path): string => route('manual.image', ['path' => $path]);
+        $imagesPathSegment = trim((string) $this->config->get('manual.images.path', '_images'), '/\\');
+
+        return function(string $path) use ($imagesPathSegment): string {
+            if (str_starts_with($path, '@image/')) {
+                $remainder = ltrim(substr($path, strlen('@image/')), '/');
+                $path = $remainder !== '' ? $imagesPathSegment . '/' . $remainder : $imagesPathSegment;
+            }
+            return route('manual.image', ['path' => $path]);
+        };
     }
 
     private function documentUrl(string $routePath): string {
