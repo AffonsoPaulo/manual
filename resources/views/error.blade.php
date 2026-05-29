@@ -7,7 +7,7 @@
     <title>{{ $siteTitle }} · Erro</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -48,7 +48,7 @@
         }
 
         h1 {
-            font-family: 'Syne', -apple-system, sans-serif;
+            font-family: 'Outfit', -apple-system, sans-serif;
             font-size: clamp(1.375rem, 3vw, 1.75rem);
             font-weight: 800;
             letter-spacing: -0.03em;

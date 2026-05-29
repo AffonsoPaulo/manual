@@ -15,7 +15,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
     <style>
         /* ── Tokens ──────────────────────────────────────────────────────────────── */
@@ -46,7 +46,7 @@
             --content-max:      728px;
 
             --font:             'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            --font-heading:     'Syne', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-heading:     'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             --font-mono:        'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
 
             --ease:             cubic-bezier(0.16, 1, 0.3, 1);
